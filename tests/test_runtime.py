@@ -28,6 +28,7 @@ def test_runtime_selects_regulated_branch_and_records_trace(tmp_path) -> None:
     assert "SGE.PULL" in event_types
     assert "EAP.PACKET" in event_types
     assert "OBS.DECISION" in event_types
+    assert "AIT.DISPATCH" in event_types
     assert "PROMPT.BUILD" in event_types
     assert "NST.AFTER" in event_types
     assert "OBS.OUT" in event_types

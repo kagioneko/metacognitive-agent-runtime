@@ -9,6 +9,7 @@ from .models import AgentResult, Memory, Prediction
 from .predictor import Predictor
 from .prompts import PromptBuilder
 from .state import NeuroState
+from .tape import TapeBus, default_tape_bus
 from .trace import TraceRecorder, new_trace_id, prediction_payload, render_html, render_markdown
 
 
@@ -22,6 +23,7 @@ class MetacognitiveRuntime:
         predictor: Optional[Predictor] = None,
         llm: Optional[LLMClient] = None,
         prompt_builder: Optional[PromptBuilder] = None,
+        tape_bus: Optional[TapeBus] = None,
     ) -> None:
         self.state = state or NeuroState()
         self.memories = memories or default_memories()
@@ -29,6 +31,7 @@ class MetacognitiveRuntime:
         self.predictor = predictor or Predictor()
         self.llm = llm or FakeLLMClient()
         self.prompt_builder = prompt_builder or PromptBuilder()
+        self.tape_bus = tape_bus or default_tape_bus()
 
     def run(
         self,
@@ -72,6 +75,17 @@ class MetacognitiveRuntime:
 
         selected = self._select(predictions)
         recorder.emit("OBS.DECISION", {"selected": selected.branch.name, "risk": selected.risk})
+        for reply in self._dispatch_children(selected):
+            recorder.emit(
+                "AIT.DISPATCH",
+                {
+                    "child": reply.child,
+                    "tape": reply.tape,
+                    "ok": reply.ok,
+                    "elapsed_ms": reply.elapsed_ms,
+                    "result": reply.result,
+                },
+            )
 
         messages = self.prompt_builder.answer_prompt(
             user_input=user_input,
@@ -105,6 +119,29 @@ class MetacognitiveRuntime:
         kept = [prediction for prediction in predictions if prediction.decision == "keep"]
         candidates = kept or predictions
         return min(candidates, key=lambda item: (item.risk, -item.utility))
+
+    def _dispatch_children(self, selected: Prediction):
+        if selected.branch.name == "respond_calmly":
+            return [
+                self.tape_bus.dispatch(
+                    "data",
+                    domain="data",
+                    action="summarize",
+                    target=7,
+                    priority=3,
+                )
+            ]
+        if selected.branch.name == "argue_back":
+            return [
+                self.tape_bus.dispatch(
+                    "security",
+                    domain="security",
+                    action="xss",
+                    target=4,
+                    priority=9,
+                )
+            ]
+        return []
 
 
 def default_memories() -> list[Memory]:

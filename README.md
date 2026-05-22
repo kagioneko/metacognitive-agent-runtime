@@ -23,6 +23,7 @@ user input
   -> branch risk forecast
   -> selected branch
   -> EAP prediction packet
+  -> AIT child-agent dispatch
   -> FakeLLM answer
   -> NST.AFTER
   -> OBS.OUT
@@ -60,6 +61,20 @@ Print JSON:
 
 ```bash
 metacog run --input "XSSを見て" --json
+```
+
+The runtime also dispatches compact AIT-style instructions to child agents after
+branch selection. For example, the selected `respond_calmly` branch sends a
+four-character tape to the data child:
+
+```text
+d7m3
+```
+
+Meaning:
+
+```text
+data / ctx7 / summarize / priority3
 ```
 
 Use the optional OpenAI adapter:
