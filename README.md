@@ -78,6 +78,15 @@ The demo shows:
 - EAP prediction packets
 - AIT child-agent dispatch
 
+Benchmark the local loop:
+
+```bash
+metacog bench --iterations 100 --json
+```
+
+The benchmark uses `FakeLLMClient`, so it does not call external APIs. It reports
+runtime latency, AIT dispatch latency, selected branch counts, and events per run.
+
 The runtime also dispatches compact AIT-style instructions to child agents after
 branch selection. For example, the selected `respond_calmly` branch sends a
 four-character tape to the data child:

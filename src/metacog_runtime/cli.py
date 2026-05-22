@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .bench import run_benchmark
 from .demo import render_demo_html, run_demo
 from .llm import FakeLLMClient, OpenAIChatClient
 from .runtime import MetacognitiveRuntime
@@ -25,6 +26,10 @@ def main() -> None:
     demo = subparsers.add_parser("demo", help="Generate a hackathon demo HTML page.")
     demo.add_argument("--output", required=True)
 
+    bench = subparsers.add_parser("bench", help="Benchmark the local metacognitive loop.")
+    bench.add_argument("--iterations", type=int, default=100)
+    bench.add_argument("--json", action="store_true")
+
     args = parser.parse_args()
 
     if args.command == "run":
@@ -45,6 +50,17 @@ def main() -> None:
         result = run_demo()
         Path(args.output).write_text(render_demo_html(result), encoding="utf-8")
         print(args.output)
+    elif args.command == "bench":
+        result = run_benchmark(args.iterations)
+        if args.json:
+            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(f"iterations: {result.iterations}")
+            print(f"avg_runtime_ms: {result.avg_runtime_ms}")
+            print(f"p95_runtime_ms: {result.p95_runtime_ms}")
+            print(f"avg_ait_dispatch_ms: {result.avg_ait_dispatch_ms}")
+            print(f"selected_counts: {result.selected_counts}")
+            print(f"events_per_run: {result.events_per_run}")
 
 
 if __name__ == "__main__":

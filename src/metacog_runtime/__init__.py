@@ -1,3 +1,4 @@
+from .bench import BenchResult, run_benchmark
 from .demo import render_demo_html, run_demo
 from .llm import FakeLLMClient, LLMClient, OpenAIChatClient
 from .prompts import PromptBuilder
@@ -6,6 +7,7 @@ from .tape import TapeBus, TapeChild, TapeReply, decode_tape, encode_tape
 
 __all__ = [
     "AgentResult",
+    "BenchResult",
     "FakeLLMClient",
     "LLMClient",
     "MetacognitiveRuntime",
@@ -18,4 +20,5 @@ __all__ = [
     "encode_tape",
     "render_demo_html",
     "run_demo",
+    "run_benchmark",
 ]
