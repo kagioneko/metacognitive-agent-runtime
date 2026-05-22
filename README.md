@@ -62,6 +62,13 @@ Print JSON:
 metacog run --input "XSSを見て" --json
 ```
 
+Use the optional OpenAI adapter:
+
+```bash
+python -m pip install -e ".[openai]"
+OPENAI_API_KEY=... metacog run --input "XSSを見て" --llm openai --model gpt-4.1-mini
+```
+
 ## Python API
 
 ```python
@@ -72,6 +79,14 @@ result = runtime.run("無理難題を批判された。急いで全部やって"
 
 print(result.answer)
 print(result.selected_branch)
+```
+
+By default, the runtime uses `FakeLLMClient`. Real LLM clients only need to
+implement:
+
+```python
+def complete(messages: list[dict[str, str]]) -> str:
+    ...
 ```
 
 ## What This Is
@@ -92,4 +107,3 @@ agent's external cognitive substrate.
 ## License
 
 MIT
-

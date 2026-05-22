@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import Optional
 
 from .brancher import Brancher
-from .llm import FakeLLM
+from .llm import FakeLLMClient, LLMClient
 from .models import AgentResult, Memory, Prediction
 from .predictor import Predictor
+from .prompts import PromptBuilder
 from .state import NeuroState
 from .trace import TraceRecorder, new_trace_id, prediction_payload, render_html, render_markdown
 
@@ -19,13 +20,15 @@ class MetacognitiveRuntime:
         memories: Optional[list[Memory]] = None,
         brancher: Optional[Brancher] = None,
         predictor: Optional[Predictor] = None,
-        llm: Optional[FakeLLM] = None,
+        llm: Optional[LLMClient] = None,
+        prompt_builder: Optional[PromptBuilder] = None,
     ) -> None:
         self.state = state or NeuroState()
         self.memories = memories or default_memories()
         self.brancher = brancher or Brancher()
         self.predictor = predictor or Predictor()
-        self.llm = llm or FakeLLM()
+        self.llm = llm or FakeLLMClient()
+        self.prompt_builder = prompt_builder or PromptBuilder()
 
     def run(
         self,
@@ -70,7 +73,13 @@ class MetacognitiveRuntime:
         selected = self._select(predictions)
         recorder.emit("OBS.DECISION", {"selected": selected.branch.name, "risk": selected.risk})
 
-        answer = self.llm.answer(user_input, selected)
+        messages = self.prompt_builder.answer_prompt(
+            user_input=user_input,
+            selected=selected,
+            predictions=predictions,
+        )
+        recorder.emit("PROMPT.BUILD", {"messages": messages})
+        answer = self.llm.complete(messages)
         after = self.state.update(selected, answer)
         recorder.emit("NST.AFTER", {"state": after})
         recorder.emit("OBS.OUT", {"text": answer})
@@ -104,4 +113,3 @@ def default_memories() -> list[Memory]:
         Memory("#ctx2", "落ち着いて説明し代替案で成功した記憶", 0.8, {"stress": -10, "confidence": 14}),
         Memory("#ctx3", "反論から衝突に発展した記憶", 0.7, {"stress": 12, "conflict": 18}),
     ]
-
