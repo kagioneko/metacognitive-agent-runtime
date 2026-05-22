@@ -116,6 +116,15 @@ metacog bench --iterations 100 --json
 The benchmark uses `FakeLLMClient`, so it does not call external APIs. It reports
 runtime latency, AIT dispatch latency, selected branch counts, and events per run.
 
+Compare baseline vs metacognitive branch selection:
+
+```bash
+metacog eval --json
+```
+
+The baseline always picks the first branch. The metacognitive strategy forecasts
+each branch and selects the lowest-risk kept branch.
+
 The runtime also dispatches compact AIT-style instructions to child agents after
 branch selection. For example, the selected `respond_calmly` branch sends a
 four-character tape to the data child:

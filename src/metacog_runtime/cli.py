@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .bench import run_benchmark
 from .demo import render_demo_html, run_demo
+from .eval import run_evaluation
 from .llm import FakeLLMClient, OpenAIChatClient
 from .runtime import MetacognitiveRuntime
 
@@ -29,6 +30,9 @@ def main() -> None:
     bench = subparsers.add_parser("bench", help="Benchmark the local metacognitive loop.")
     bench.add_argument("--iterations", type=int, default=100)
     bench.add_argument("--json", action="store_true")
+
+    eval_cmd = subparsers.add_parser("eval", help="Compare baseline vs metacognitive branch selection.")
+    eval_cmd.add_argument("--json", action="store_true")
 
     args = parser.parse_args()
 
@@ -61,6 +65,15 @@ def main() -> None:
             print(f"avg_ait_dispatch_ms: {result.avg_ait_dispatch_ms}")
             print(f"selected_counts: {result.selected_counts}")
             print(f"events_per_run: {result.events_per_run}")
+    elif args.command == "eval":
+        result = run_evaluation()
+        if args.json:
+            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(f"cases: {result.cases}")
+            print(f"baseline: {result.baseline.to_dict()}")
+            print(f"metacognitive: {result.metacognitive.to_dict()}")
+            print(f"improvement: {result.improvement}")
 
 
 if __name__ == "__main__":
