@@ -1,6 +1,43 @@
 # Metacognitive Agent Runtime
 
-> A minimal runtime loop for external metacognition in AI agents.
+> AI agents that think in branches, predict their future state, reject risky paths, and dispatch child agents with 4-character instruction tapes.
+
+## Try It In 30 Seconds
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev]"
+
+.venv/bin/metacog demo --output demo.html
+.venv/bin/metacog bench --iterations 100 --json
+```
+
+Example benchmark on a local FakeLLM run:
+
+```json
+{
+  "iterations": 100,
+  "avg_runtime_ms": 0.314,
+  "p95_runtime_ms": 0.3625,
+  "avg_ait_dispatch_ms": 0.0037,
+  "selected_counts": {
+    "respond_calmly": 100
+  },
+  "events_per_run": 23
+}
+```
+
+No external API calls are needed for the demo or benchmark.
+
+## The Backbone
+
+```text
+GDC branch -> SGE memory pull -> NeuroState delta -> EAP prediction packet -> AIT child dispatch
+```
+
+That is the implementation backbone of the metacognitive OS.
+
+## What Happens
 
 This project wires the toolchain together:
 
@@ -29,14 +66,6 @@ user input
   -> OBS.OUT
   -> Markdown report / HTML dashboard
 ```
-
-The important spine:
-
-```text
-GDC branch -> SGE memory pull -> NeuroState delta -> EAP prediction packet
-```
-
-That is the implementation backbone of the metacognitive OS.
 
 ## Install
 
