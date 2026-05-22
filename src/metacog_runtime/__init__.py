@@ -1,3 +1,4 @@
+from .demo import render_demo_html, run_demo
 from .llm import FakeLLMClient, LLMClient, OpenAIChatClient
 from .prompts import PromptBuilder
 from .runtime import AgentResult, MetacognitiveRuntime
@@ -15,4 +16,6 @@ __all__ = [
     "TapeReply",
     "decode_tape",
     "encode_tape",
+    "render_demo_html",
+    "run_demo",
 ]

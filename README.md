@@ -63,6 +63,21 @@ Print JSON:
 metacog run --input "XSSを見て" --json
 ```
 
+Generate a hackathon-ready HTML demo:
+
+```bash
+metacog demo --output demo.html
+```
+
+The demo shows:
+
+- user input and final answer
+- branch decisions and risk
+- NeuroState before/after
+- memory gravity pulls
+- EAP prediction packets
+- AIT child-agent dispatch
+
 The runtime also dispatches compact AIT-style instructions to child agents after
 branch selection. For example, the selected `respond_calmly` branch sends a
 four-character tape to the data child:
